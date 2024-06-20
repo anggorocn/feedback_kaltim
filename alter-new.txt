@@ -1,0 +1,73 @@
+alter table data.riwayat_jabatan add column jabatan_id character varying;
+alter table simpeg.pegawai add column last_jabatan_id character varying;
+
+CREATE TABLE data.rencana_suksesi
+(
+  rencana_suksesi_id numeric NOT NULL,
+  nama character varying,
+  CONSTRAINT rencana_suksesi_pkey PRIMARY KEY (rencana_suksesi_id)
+);
+ALTER TABLE data.rencana_suksesi OWNER TO postgres;
+
+CREATE TABLE data.rencana_suksesi_detil
+(
+  rencana_suksesi_id numeric NOT NULL,
+  infokey character varying NOT NULL,
+  infoval character varying,
+  CONSTRAINT rencana_suksesi_detil_pkey PRIMARY KEY (rencana_suksesi_id, infokey, infoval)
+);
+ALTER TABLE data.rencana_suksesi_detil OWNER TO postgres;
+
+drop table if exists data.rencana_suksesi_pegawai;
+CREATE TABLE data.rencana_suksesi_pegawai
+(
+  rencana_suksesi_id numeric NOT NULL,
+  pegawai_id numeric NOT NULL,
+  nilai_x numeric,
+  nilai_y numeric,
+  order_kuadran numeric,
+  penilaian_id text,
+  CONSTRAINT rencana_suksesi_pegawai_pkey PRIMARY KEY (rencana_suksesi_id, pegawai_id)
+);
+ALTER TABLE data.rencana_suksesi_pegawai OWNER TO postgres;
+
+CREATE OR REPLACE FUNCTION data.rencana_suksesi_hapus_p()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+temprowid integer;
+tempperiode CHARACTER VARYING(50);
+tempinfo TEXT;
+tempquery TEXT;
+BEGIN
+
+  --check value pada table
+  DELETE FROM data.rencana_suksesi_detil WHERE rencana_suksesi_id = OLD.rencana_suksesi_id;
+  DELETE FROM data.rencana_suksesi_pegawai WHERE rencana_suksesi_id = OLD.rencana_suksesi_id;
+  RETURN OLD;
+END;
+$BODY$
+LANGUAGE plpgsql VOLATILE COST 100;
+ALTER FUNCTION data.rencana_suksesi_hapus_p() OWNER TO postgres;
+
+DROP TRIGGER if exists rencana_suksesi_hapus_t ON data.rencana_suksesi;
+CREATE TRIGGER rencana_suksesi_hapus_t
+BEFORE DELETE
+ON data.rencana_suksesi
+FOR EACH ROW
+EXECUTE PROCEDURE data.rencana_suksesi_hapus_p();
+
+
+http://192.168.88.100/kemendagri-cat-asesor/asesor/penilaian_monitoring.php?reqJadwalTesId=339&reqPegawaiId=41
+http://192.168.88.100/kemendagri-cat-asesor/asesor/penilaian_monitoring.php?reqJadwalTesId=331&reqPegawaiId=6225
+
+199410072016092001
+select A.* FROM simpeg.pegawai A WHERE PEGAWAI_ID = 2108
+
+196610171992031001
+select A.* FROM simpeg.pegawai A WHERE PEGAWAI_ID = 753
+
+
+199109092012061004
+select a.* from simpeg.pegawai a where pegawai_id = 6269
+http://192.168.88.100/kemendagri-cat-asesor/asesor/penilaian_monitoring.php?reqJadwalTesId=333&reqPegawaiId=6269&reqSelectPenggalianId=tabs-nilaiakhir

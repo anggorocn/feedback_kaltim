@@ -1,0 +1,1128 @@
+alter table simpeg.pegawai
+add column login_pass character varying
+;
+
+update simpeg.pegawai as u
+set
+login_pass= x.login_pass
+from
+(
+	select pegawai_id, md5(nip_baru) login_pass from simpeg.pegawai
+) as x
+where u.pegawai_id = x.pegawai_id;
+
+--drop table if exists simpeg.agama;
+create table if not exists simpeg.agama
+(
+  agama_id numeric not null,
+  nama character varying(100) not null,
+  status character varying(1),
+  last_user character varying,
+  last_date timestamp without time zone,
+  user_login_id numeric,
+  user_login_pegawai_id numeric,
+  constraint pk_agama primary key (agama_id),
+  constraint ak_u_agama unique (nama)
+);
+
+create table if not exists data.riwayat_skp
+(
+  riwayat_skp_id numeric not null,
+  tahun numeric,
+  pegawai_id numeric,
+  nilai numeric
+) with (oids=false);
+alter table data.riwayat_skp owner to postgres;
+
+insert into simpeg.agama(agama_id, nama) values (1, 'ISLAM');
+insert into simpeg.agama(agama_id, nama) values (2, 'KRISTEN PROTESTAN');
+insert into simpeg.agama(agama_id, nama) values (3, 'KATHOLIK');
+insert into simpeg.agama(agama_id, nama) values (4, 'HINDU');
+insert into simpeg.agama(agama_id, nama) values (5, 'BUDHA');
+insert into simpeg.agama(agama_id, nama) values (6, 'KEPERCAYAAN KTYME');
+
+--drop table if exists simpeg.tingkat_pendidikan;
+create table if not exists simpeg.tingkat_pendidikan
+(
+  tingkat_pendidikan_id numeric not null,
+  nama character varying(100) not null,
+  status character varying(1),
+  last_user character varying,
+  last_date timestamp without time zone,
+  user_login_id numeric,
+  user_login_pegawai_id numeric,
+  constraint pk_tingkat_pendidikan primary key (tingkat_pendidikan_id),
+  constraint ak_u_tingkat_pendidikan unique (nama)
+);
+
+insert into simpeg.tingkat_pendidikan(tingkat_pendidikan_id, nama) values (1, '10 PTDN atau Kedinasan');
+insert into simpeg.tingkat_pendidikan(tingkat_pendidikan_id, nama) values (2, '10 PTDN Terbaik');
+insert into simpeg.tingkat_pendidikan(tingkat_pendidikan_id, nama) values (3, 'Lainnya');
+insert into simpeg.tingkat_pendidikan(tingkat_pendidikan_id, nama) values (4, 'Luar Negeri');
+
+--drop table if exists simpeg.kampus;
+create table if not exists simpeg.kampus
+(
+  kampus_id numeric not null,
+  tingkat_pendidikan_id numeric not null,
+  nama character varying(100) not null,
+  status character varying(1),
+  last_user character varying,
+  last_date timestamp without time zone,
+  user_login_id numeric,
+  user_login_pegawai_id numeric,
+  constraint pk_kampus primary key (kampus_id),
+  constraint ak_u_kampus unique (nama, tingkat_pendidikan_id)
+);
+
+insert into simpeg.kampus(kampus_id, tingkat_pendidikan_id, nama) values (1,1, 'UNIVERSITAS AIRLANGGA');
+insert into simpeg.kampus(kampus_id, tingkat_pendidikan_id, nama) values (2,4, 'THE UNIVERSITY OF NEW SOUTH WALES');
+insert into simpeg.kampus(kampus_id, tingkat_pendidikan_id, nama) values (3,3, 'UNIVERSITAS PANCASILA');
+insert into simpeg.kampus(kampus_id, tingkat_pendidikan_id, nama) values (4,2, 'UNIVERSITAS GADJAH MADA');
+
+alter table simpeg.riwayat_pendidikan
+add column kampus_id numeric
+;
+
+drop table if exists simpeg.user_login;
+CREATE TABLE simpeg.user_login
+(
+  user_login_id numeric NOT NULL,
+  user_group_id numeric NOT NULL,
+  login_user character varying NOT NULL,
+  login_pass character varying NOT NULL,
+  login_user_nama character varying NOT NULL,
+  login_level numeric,
+  status character varying(1),
+  last_user character varying,
+  last_date timestamp without time zone,
+  satuan_kerja_id numeric,
+  status_menu_khusus numeric,
+  CONSTRAINT pk_simpeg_user_login PRIMARY KEY (user_login_id),
+  CONSTRAINT ak_u_user_log UNIQUE (login_user)
+)
+WITH (OIDS=FALSE);
+ALTER TABLE simpeg.user_login OWNER TO postgres;
+
+delete from simpeg.user_login;
+insert into simpeg.user_login(user_login_id, user_group_id, login_user, login_pass, login_user_nama) values (1,1, 'admin', '21232f297a57a5a743894a0e4a801fc3', 'Administrator');
+
+drop table if exists simpeg.permen_indikator;
+CREATE TABLE simpeg.permen_indikator
+(
+  permen_indikator_id integer NOT NULL,
+  nama character varying(255),
+  keterangan character varying(4000),
+  status character(1),
+  CONSTRAINT permen_indikator_pkey PRIMARY KEY (permen_indikator_id)
+)
+WITH (OIDS=FALSE);
+ALTER TABLE simpeg.permen_indikator OWNER TO postgres;
+
+insert into simpeg.permen_indikator(permen_indikator_id, nama, status) values (1, 'peraturan new',1);
+
+--drop table if exists simpeg.indikator_penilaian;
+create table if not exists simpeg.indikator_penilaian
+(
+  indikator_penilaian_id integer not null,
+  permen_indikator_id integer not null,
+  jenis character varying,
+  nama character varying,
+  jenis_subindikator character varying,
+  constraint indikator_penilaian_pkey primary key (indikator_penilaian_id),
+  constraint ak_u_indikator_penilaian unique (permen_indikator_id, nama),
+  constraint ak_u_indikator_penilaian_mode unique (permen_indikator_id, jenis_subindikator)
+)
+with (oids=false);
+alter table simpeg.indikator_penilaian owner to postgres;
+
+insert into simpeg.indikator_penilaian (indikator_penilaian_id, permen_indikator_id, jenis, nama, jenis_subindikator) values (1, 1, 'potensi', 'Potensi', 'potensi');
+insert into simpeg.indikator_penilaian (indikator_penilaian_id, permen_indikator_id, jenis, nama, jenis_subindikator) values (2, 1, 'potensi', 'Kompetensi', 'kompetensi');
+insert into simpeg.indikator_penilaian (indikator_penilaian_id, permen_indikator_id, jenis, nama, jenis_subindikator) values (3, 1, 'potensi', 'Pendidikan Formal', 'pendidikan_formal');
+insert into simpeg.indikator_penilaian (indikator_penilaian_id, permen_indikator_id, jenis, nama, jenis_subindikator) values (4, 1, 'potensi', 'Pendidikan dan Pelatihan', 'pelatihan');
+insert into simpeg.indikator_penilaian (indikator_penilaian_id, permen_indikator_id, jenis, nama, jenis_subindikator) values (5, 1, 'potensi', 'Pengalaman Dalam Jabatan', 'jabatan');
+insert into simpeg.indikator_penilaian (indikator_penilaian_id, permen_indikator_id, jenis, nama, jenis_subindikator) values (6, 1, 'potensi', 'Komitmen Organisasi', 'komitmenorganisasi');
+insert into simpeg.indikator_penilaian (indikator_penilaian_id, permen_indikator_id, jenis, nama, jenis_subindikator) values (7, 1, 'potensi', 'Pangkat/Gol. Ruang', 'pangkat');
+
+--drop table if exists simpeg.indikator_penilaian_sub;
+create table if not exists simpeg.indikator_penilaian_sub
+(
+  permen_indikator_id integer not null,
+  indikator_penilaian_id integer not null,
+  sub_indikator_id integer not null,
+  nama character varying,
+  constraint indikator_penilaian_sub_pkey primary key (indikator_penilaian_id, sub_indikator_id, permen_indikator_id)
+)
+with (oids=false);
+alter table simpeg.indikator_penilaian_sub owner to postgres;
+
+create or replace function simpeg.indikator_penilaian_sub_p()
+  returns trigger as
+$body$
+
+declare 
+vjenissubindikator character varying;
+vnama character varying;
+
+begin
+  select jenis_subindikator into vjenissubindikator
+  from simpeg.indikator_penilaian where permen_indikator_id = new.permen_indikator_id and indikator_penilaian_id = new.indikator_penilaian_id;
+
+  vnama:= new.nama;
+  if vjenissubindikator = 'pendidikan_formal' then
+  select nama into vnama from simpeg.pendidikan where pendidikan_id = new.sub_indikator_id;
+  end if;
+
+  new.nama:= vnama;
+
+  return new;
+end;
+$body$
+language plpgsql volatile cost 100;
+alter function simpeg.formula_penilaian_bobot_p()owner to postgres;
+
+drop trigger if exists indikator_penilaian_sub_t on simpeg.indikator_penilaian_sub;
+create trigger indikator_penilaian_sub_t
+before insert or update
+on simpeg.indikator_penilaian_sub
+for each row
+execute procedure simpeg.indikator_penilaian_sub_p();
+
+delete from simpeg.indikator_penilaian_sub;
+insert into simpeg.indikator_penilaian_sub (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, nama) values (1, 1, 1, 'Potensi');
+insert into simpeg.indikator_penilaian_sub (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, nama) values (1, 2, 1, 'Kompetensi');
+insert into simpeg.indikator_penilaian_sub (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, nama) values (1, 3, 8, '');
+insert into simpeg.indikator_penilaian_sub (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, nama) values (1, 3, 9, '');
+insert into simpeg.indikator_penilaian_sub (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, nama) values (1, 3, 10, '');
+insert into simpeg.indikator_penilaian_sub (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, nama) values (1, 4, 1, 'Diklat Kepemimpinan/Fungsional');
+insert into simpeg.indikator_penilaian_sub (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, nama) values (1, 4, 2, 'Diklat Teknis');
+insert into simpeg.indikator_penilaian_sub (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, nama) values (1, 5, 1, 'Jumlah Jenis Jabatan pada Eselon Saat Ini');
+insert into simpeg.indikator_penilaian_sub (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, nama) values (1, 5, 2, 'Lama menduduki Jabatan Terakhir');
+insert into simpeg.indikator_penilaian_sub (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, nama) values (1, 5, 3, 'Masa Kerja Eselon');
+insert into simpeg.indikator_penilaian_sub (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, nama) values (1, 5, 4, 'Pelaksana Tugas');
+insert into simpeg.indikator_penilaian_sub (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, nama) values (1, 6, 1, 'Komitmen Organisasi');
+insert into simpeg.indikator_penilaian_sub (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, nama) values (1, 7, 1, 'Pangkat/Gol. Ruang');
+
+--drop table if exists simpeg.indikator_penilaian_value;
+create table if not exists simpeg.indikator_penilaian_value
+(
+  permen_indikator_id integer not null,
+  indikator_penilaian_id integer not null,
+  sub_indikator_id integer not null,
+  sub_indikator_detil_id integer not null,
+  nama character varying,
+  vlabel character varying,
+  constraint indikator_penilaian_value_pkey primary key (indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, permen_indikator_id)
+)
+with (oids=false);
+alter table simpeg.indikator_penilaian_value owner to postgres;
+
+delete from simpeg.indikator_penilaian_value;
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 1, 1, 0, '(Nilai Potensi/500 x 100)', '(vnilai/500 x 100)');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 2, 1, 0, '(Nilai Kompetensi/500 x 100)', '(vnilai/500 x 100)');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 3, 8, 1, '1. Luar Negeri =', '1. Luar Negeri = vnilai');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 3, 8, 2, '2. 10 PTDN terbaik + Kedinasan =', '2. 10 PTDN terbaik + Kedinasan = vnilai');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 3, 8, 3, '3. Lainnya =', '3. Lainnya = vnilai');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 3, 9, 1, '1. Luar Negeri =', '1. Luar Negeri = vnilai');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 3, 9, 2, '2. 10 PTDN terbaik + Kedinasan =', '2. 10 PTDN terbaik + Kedinasan = vnilai');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 3, 9, 3, '3. Lainnya =', '3. Lainnya = vnilai');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 3, 10, 1, '1. Luar Negeri =', '1. Luar Negeri = vnilai');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 3, 10, 2, '2. 10 PTDN terbaik + Kedinasan =', '2. 10 PTDN terbaik + Kedinasan = vnilai');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 3, 10, 3, '3. Lainnya =', '3. Lainnya = vnilai');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 3, 11, 1, '1. Luar Negeri =', '1. Luar Negeri = vnilai');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 3, 11, 2, '2. 10 PTDN terbaik + Kedinasan =', '2. 10 PTDN terbaik + Kedinasan = vnilai');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 3, 11, 3, '3. Lainnya =', '3. Lainnya = vnilai');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 4, 1, 1, '1. Di atas jenjang = ', '1. Di atas jenjang = vnilai');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 4, 1, 2, '2. Sesuai jenjang = ', '2. Sesuai jenjang = vnilai');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 4, 1, 3, '3. Di bawah jenjang = ', '3. Di bawah jenjang = vnilai');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 4, 2, 1, '1. 6 atau lebih = ', '1. 6 atau lebih = vnilai');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 4, 2, 2, '2. 3 s.d 5 = ', '2. 3 s.d 5 = vnilai');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 4, 2, 3, '3. Kurang dari 3 = ', '3. Kurang dari 3 = vnilai');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 5, 1, 1, '1. 5 kali atau lebih = ', '1. 5 kali atau lebih = vnilai');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 5, 1, 2, '2. 2 s.d 4 kali = ', '2. 2 s.d 4 kali = vnilai');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 5, 1, 3, '3. 1 kali = ', '3. 1 kali = vnilai');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 5, 2, 1, '1. 3 tahun atau lebih = ', '1. 3 tahun atau lebih = vnilai');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 5, 2, 2, '2. Di atas 1 s.d 3 tahun = ', '2. Di atas 1 s.d 3 tahun = vnilai');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 5, 2, 3, '3. Kurang dari 1 tahun = ', '3. Kurang dari 1 tahun = vnilai');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 5, 3, 1, '1. 5 tahun atau lebih = ', '1. 5 tahun atau lebih = vnilai');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 5, 3, 2, '2. Di atas 2 s.d 5 tahun = ', '2. Di atas 2 s.d 5 tahun = vnilai');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 5, 3, 3, '3. Kurang dari 2 tahun = ', '3. Kurang dari 2 tahun = vnilai');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 5, 4, 1, '1. Plt. Jenjang lebih tinggi = ', '1. Plt. Jenjang lebih tinggi = vnilai');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 5, 4, 2, '2. Plt. Jenjang setara = ', '2. Plt. Jenjang setara = vnilai');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 6, 1, 0, 'Nilai EES (Maksimal 100)', 'Nilai EES (Maksimal vnilai)');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 7, 1, 1, '1. Di atas jenjang = ', '1. Di atas jenjang = vnilai');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 7, 1, 2, '2. Sesuai jenjang = ', '2. Sesuai jenjang = vnilai');
+insert into simpeg.indikator_penilaian_value (permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id, nama, vlabel) values (1, 7, 1, 3, '3. Di bawah jenjang = ', '3. Di bawah jenjang = vnilai');
+
+--drop table if exists simpeg.formula_penilaian;
+create table if not exists simpeg.formula_penilaian
+(
+  formula_penilaian_id integer not null,
+  permen_indikator_id integer not null,
+  nama character varying,
+  constraint formula_penilaian_pkey primary key (formula_penilaian_id)
+)
+with (oids=false);
+alter table simpeg.formula_penilaian owner to postgres;
+insert into simpeg.formula_penilaian (formula_penilaian_id, permen_indikator_id, nama) values (1, 1, 'Indikator Penilaian PT.Djarum 75');
+
+create table if not exists simpeg.formula_tp
+(
+  formula_penilaian_id numeric not null,
+  toleransi_y numeric,
+  toleransi_x numeric,
+  skp_x0 numeric,
+  skp_y0 numeric,
+  gm_x0 numeric,
+  gm_y0 numeric,
+  skp_x1 numeric,
+  skp_y1 numeric,
+  gm_x1 numeric,
+  gm_y1 numeric,
+  skp_x2 numeric,
+  skp_y2 numeric,
+  gm_x2 numeric,
+  gm_y2 numeric,
+  constraint formula_tp_pkey primary key (formula_penilaian_id)
+)
+with ( oids=false);
+alter table simpeg.formula_tp owner to postgres;
+
+--drop table if exists simpeg.formula_penilaian_bobot;
+create table if not exists simpeg.formula_penilaian_bobot
+(
+  formula_penilaian_id integer not null,
+  permen_indikator_id integer not null,
+  indikator_penilaian_id integer not null,
+  jenis_subindikator character varying,
+  sub_indikator_id integer not null,
+  nilai numeric,
+  constraint formula_penilaian_bobot_pkey primary key (formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, sub_indikator_id)
+)
+with (oids=false);
+alter table simpeg.formula_penilaian_bobot owner to postgres;
+
+create or replace function simpeg.formula_penilaian_bobot_p()
+  returns trigger as
+$body$
+
+declare 
+vjenissubindikator character varying;
+
+begin
+  select jenis_subindikator into vjenissubindikator
+  from simpeg.indikator_penilaian where permen_indikator_id = new.permen_indikator_id and indikator_penilaian_id = new.indikator_penilaian_id;
+
+  new.jenis_subindikator:= vjenissubindikator;
+
+  return new;
+end;
+$body$
+language plpgsql volatile cost 100;
+alter function simpeg.formula_penilaian_bobot_p()owner to postgres;
+
+drop trigger if exists formula_penilaian_bobot_t on simpeg.formula_penilaian_bobot;
+create trigger formula_penilaian_bobot_t
+before insert or update
+on simpeg.formula_penilaian_bobot
+for each row
+execute procedure simpeg.formula_penilaian_bobot_p();
+
+insert into simpeg.formula_penilaian_bobot (formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, sub_indikator_id, nilai) values (1, 1, 1, 1, 15);
+insert into simpeg.formula_penilaian_bobot (formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, sub_indikator_id, nilai) values (1, 1, 2, 1, 20);
+insert into simpeg.formula_penilaian_bobot (formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, sub_indikator_id, nilai) values (1, 1, 3, 8, 10);
+insert into simpeg.formula_penilaian_bobot (formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, sub_indikator_id, nilai) values (1, 1, 3, 9, 5);
+insert into simpeg.formula_penilaian_bobot (formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, sub_indikator_id, nilai) values (1, 1, 3, 10, 5);
+insert into simpeg.formula_penilaian_bobot (formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, sub_indikator_id, nilai) values (1, 1, 4, 1, 5);
+insert into simpeg.formula_penilaian_bobot (formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, sub_indikator_id, nilai) values (1, 1, 4, 2, 5);
+insert into simpeg.formula_penilaian_bobot (formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, sub_indikator_id, nilai) values (1, 1, 5, 1, 3);
+insert into simpeg.formula_penilaian_bobot (formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, sub_indikator_id, nilai) values (1, 1, 5, 2, 5);
+insert into simpeg.formula_penilaian_bobot (formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, sub_indikator_id, nilai) values (1, 1, 5, 3, 5);
+insert into simpeg.formula_penilaian_bobot (formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, sub_indikator_id, nilai) values (1, 1, 5, 4, 7);
+insert into simpeg.formula_penilaian_bobot (formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, sub_indikator_id, nilai) values (1, 1, 6, 1, 10);
+insert into simpeg.formula_penilaian_bobot (formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, sub_indikator_id, nilai) values (1, 1, 7, 1, 5);
+
+--drop table if exists simpeg.formula_penilaian_value;
+create table if not exists simpeg.formula_penilaian_value
+(
+  formula_penilaian_id integer not null,
+  permen_indikator_id integer not null,
+  indikator_penilaian_id integer not null,
+  jenis_subindikator character varying,
+  sub_indikator_id integer not null,
+  sub_indikator_detil_id integer not null,
+  nilai numeric,
+  constraint formula_penilaian_value_pkey primary key (formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, sub_indikator_id, sub_indikator_detil_id)
+)
+with (oids=false);
+alter table simpeg.formula_penilaian_value owner to postgres;
+
+create or replace function simpeg.formula_penilaian_value_p()
+  returns trigger as
+$body$
+
+declare 
+vjenissubindikator character varying;
+
+begin
+  select jenis_subindikator into vjenissubindikator
+  from simpeg.indikator_penilaian where permen_indikator_id = new.permen_indikator_id and indikator_penilaian_id = new.indikator_penilaian_id;
+
+  new.jenis_subindikator:= vjenissubindikator;
+
+  return new;
+end;
+$body$
+language plpgsql volatile cost 100;
+alter function simpeg.formula_penilaian_value_p()owner to postgres;
+
+drop trigger if exists formula_penilaian_value_t on simpeg.formula_penilaian_value;
+create trigger formula_penilaian_value_t
+before insert or update
+on simpeg.formula_penilaian_value
+for each row
+execute procedure simpeg.formula_penilaian_value_p();
+
+CREATE OR REPLACE FUNCTION simpeg.pembulatan(vnilai numeric)
+  RETURNS numeric AS
+$BODY$
+declare 
+
+vartemp numeric;
+varreturn numeric;
+
+begin
+  case when coalesce(vnilai,0) > 0 
+  then 
+  vartemp:= round(vnilai,2);
+  else
+  vartemp:= 0;
+  end case;
+  
+  case when vartemp - floor(vartemp) > .00 
+  then varreturn:= vartemp;
+  else 
+  varreturn:= cast(vartemp as integer);
+  end case;
+  
+  return varreturn; 
+end;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION simpeg.pembulatan(numeric)
+  OWNER TO postgres;
+  
+CREATE OR REPLACE FUNCTION simpeg.pembagi(n1 numeric, n2 numeric)
+  RETURNS numeric AS
+$BODY$
+declare 
+
+vartemp numeric;
+varreturn numeric;
+
+begin
+  case when coalesce(n2,0) > 0 
+  then 
+  vartemp:= round(coalesce(n1,0) / coalesce(n2,0) * 100,2);
+  else
+  vartemp:= 0;
+  end case;
+
+  select simpeg.pembulatan(vartemp) into varreturn;
+  
+  return varreturn; 
+end;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION simpeg.pembagi(numeric, numeric)
+  OWNER TO postgres;
+
+CREATE OR REPLACE FUNCTION simpeg.persentase(n1 numeric, n2 numeric)
+  RETURNS numeric AS
+$BODY$
+declare 
+
+vartemp numeric;
+varreturn numeric;
+
+begin
+  case when coalesce(n2,0) > 0 
+  then 
+  vartemp:= round(coalesce(n1,0) * (coalesce(n2,0) / 100),2);
+  else
+  vartemp:= 0;
+  end case;
+
+  select simpeg.pembulatan(vartemp) into varreturn;
+  
+  return varreturn; 
+end;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION simpeg.persentase(numeric, numeric)
+  OWNER TO postgres;
+
+create or replace function simpeg.ambil_umur_tahun(tanggal_lahir date, tanggal_sekarang date)
+  returns character varying as
+$body$
+declare 
+tmptahun varchar(100);
+begin
+    select
+    case
+       when (cast(to_char (tanggal_sekarang, 'mm') as integer)
+             - cast(to_char (tanggal_lahir, 'mm') as integer)) < 0
+       then
+            cast(to_char (tanggal_sekarang, 'yyyy') as integer)
+          - cast(to_char (tanggal_lahir, 'yyyy') as integer)
+          - 1
+       else
+          cast(to_char (tanggal_sekarang, 'yyyy') as integer)
+          - cast(to_char (tanggal_lahir, 'yyyy') as integer)
+    end
+    into tmptahun;
+   return(tmptahun);
+end;
+$body$
+language plpgsql volatile cost 100;
+alter function simpeg.ambil_umur_tahun(date, date) owner to postgres;
+
+--drop table if exists simpeg.pegawai_formula_penilaian;
+create table if not exists simpeg.pegawai_formula_penilaian
+(
+  pegawai_id numeric not null,
+  formula_penilaian_id integer not null,
+  permen_indikator_id integer not null,
+  indikator_penilaian_id integer not null,
+  jenis_subindikator character varying,
+  sub_indikator_id integer not null,
+  nilai numeric,
+  constraint pegawai_formula_penilaian_pkey primary key (pegawai_id, formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, sub_indikator_id)
+)
+with (oids=false);
+alter table simpeg.pegawai_formula_penilaian owner to postgres;
+
+insert into simpeg.pegawai_formula_penilaian (pegawai_id, formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, jenis_subindikator, sub_indikator_id, nilai) values (1760, 1, 1, 1, 'potensi', 1, 15);
+insert into simpeg.pegawai_formula_penilaian (pegawai_id, formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, jenis_subindikator, sub_indikator_id, nilai) values (1760, 1, 1, 2, 'kompetensi', 1, 20);
+insert into simpeg.pegawai_formula_penilaian (pegawai_id, formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, jenis_subindikator, sub_indikator_id, nilai) values (1760, 1, 1, 3, 'pendidikan_formal', 10, 60);
+insert into simpeg.pegawai_formula_penilaian (pegawai_id, formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, jenis_subindikator, sub_indikator_id, nilai) values (1760, 1, 1, 4, 'pelatihan', 1, 80);
+insert into simpeg.pegawai_formula_penilaian (pegawai_id, formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, jenis_subindikator, sub_indikator_id, nilai) values (1760, 1, 1, 4, 'pelatihan', 2, 80);
+insert into simpeg.pegawai_formula_penilaian (pegawai_id, formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, jenis_subindikator, sub_indikator_id, nilai) values (1760, 1, 1, 5, 'jabatan', 1, 60);
+insert into simpeg.pegawai_formula_penilaian (pegawai_id, formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, jenis_subindikator, sub_indikator_id, nilai) values (1760, 1, 1, 5, 'jabatan', 2, 60);
+insert into simpeg.pegawai_formula_penilaian (pegawai_id, formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, jenis_subindikator, sub_indikator_id, nilai) values (1760, 1, 1, 5, 'jabatan', 3, 60);
+insert into simpeg.pegawai_formula_penilaian (pegawai_id, formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, jenis_subindikator, sub_indikator_id, nilai) values (1760, 1, 1, 5, 'jabatan', 4, 100);
+insert into simpeg.pegawai_formula_penilaian (pegawai_id, formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, jenis_subindikator, sub_indikator_id, nilai) values (1760, 1, 1, 6, 'komitmenorganisasi', 1, 50);
+insert into simpeg.pegawai_formula_penilaian (pegawai_id, formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, jenis_subindikator, sub_indikator_id, nilai) values (1760, 1, 1, 7, 'pangkat', 1, 60);
+
+insert into simpeg.pegawai_formula_penilaian
+(
+  pegawai_id, formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, 
+  jenis_subindikator, sub_indikator_id, nilai
+)
+select
+b.pegawai_id, formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, jenis_subindikator, sub_indikator_id, nilai
+from simpeg.pegawai_formula_penilaian a
+, 
+(
+select pegawai_id from simpeg.pegawai where pegawai_id != 1760
+) b
+where a.pegawai_id = 1760
+
+/*
+select
+a.pegawai_id
+, sum(case when jenis_subindikator = 'potensi' then a.nilai else 0 end) potensi
+, sum(case when jenis_subindikator = 'kompetensi' then a.nilai else 0 end) kompetensi
+, sum(case when jenis_subindikator = 'pendidikan_formal' then a.nilai else 0 end) pendidikan_formal
+, sum(case when jenis_subindikator = 'pelatihan' then a.nilai else 0 end) pelatihan
+, sum(case when jenis_subindikator = 'jabatan' then a.nilai else 0 end) jabatan
+, sum(case when jenis_subindikator = 'komitmenorganisasi' then a.nilai else 0 end) komitmenorganisasi
+, sum(case when jenis_subindikator = 'pangkat' then a.nilai else 0 end) pangkat
+from simpeg.pegawai_formula_penilaian a
+group by a.pegawai_id
+*/
+
+create or replace function simpeg.ppetapegawai(formulapenilaianid numeric)
+  returns void as
+$body$
+declare
+    sqlquery text;
+
+    vpermenindikatorid integer;
+    vindikatorpenilaianid integer;
+    vjenissubindikator character varying;
+    vsubindikatorid integer;
+    vnilaibobot numeric;
+    vnilaivalue numeric;
+    vhasil numeric;
+begin
+
+  delete from simpeg.pegawai_formula_penilaian where formula_penilaian_id = formulapenilaianid;
+  
+  --jenis_subindikator = 'potensi'
+  select permen_indikator_id, indikator_penilaian_id, jenis_subindikator, sub_indikator_id, nilai
+  into vpermenindikatorid, vindikatorpenilaianid, vjenissubindikator, vsubindikatorid, vnilaibobot
+  from simpeg.formula_penilaian_bobot where formula_penilaian_id = formulapenilaianid and jenis_subindikator = 'potensi';
+
+  select nilai into vnilaivalue
+  from simpeg.formula_penilaian_value where formula_penilaian_id = formulapenilaianid and jenis_subindikator = 'potensi';
+
+  --simpan data
+  insert into simpeg.pegawai_formula_penilaian
+  (
+    pegawai_id, formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, 
+    jenis_subindikator, sub_indikator_id, nilai
+  )
+  select
+  pegawai_id, formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, jenis_subindikator, sub_indikator_id
+  , simpeg.pembagi(nilai,vnilaivalue) * simpeg.persentase(vnilaibobot,1)
+  from
+  (
+    select
+    b.pegawai_id, formulapenilaianid formula_penilaian_id, vpermenindikatorid permen_indikator_id
+    , vindikatorpenilaianid indikator_penilaian_id, vjenissubindikator jenis_subindikator, vsubindikatorid sub_indikator_id
+    , round(sum((a.atribut_bobot * (b.skor)) + ((a.atribut_bobot * (b.skor)) -(a.atribut_bobot * (b.skor)))),2) nilai
+    from formula_atribut_bobot a
+    inner join
+    (
+      select
+      pd.formula_eselon_id, substr(pd.atribut_id, 1,2) atribut_id
+      , sum(nilai) / count(1) skor, p.pegawai_id, to_char(p.tanggal_tes, 'yyyy') tahun
+      , p.jadwal_tes_id
+      from penilaian_detil pd
+      inner join penilaian p on pd.penilaian_id = p.penilaian_id
+      where 1=1 
+      and exists
+      (
+        select 1
+        from
+        (
+          select pegawai_id, penilaian_id
+          from penilaian a
+          where a.aspek_id = '1'
+          --and a.pegawai_id = 53
+          and exists
+          (
+            select 1
+            from
+            (
+              select pegawai_id, max(tanggal_tes) tanggal_tes from penilaian where aspek_id = '1' group by pegawai_id
+            ) x where a.pegawai_id = x.pegawai_id and a.tanggal_tes = x.tanggal_tes
+          )
+        ) x where x.pegawai_id = pd.pegawai_id and x.penilaian_id = pd.penilaian_id
+      )
+      group by pd.formula_eselon_id, substr(pd.atribut_id, 1,2), p.pegawai_id, to_char(p.tanggal_tes, 'yyyy'), p.jadwal_tes_id
+    ) b on a.formula_eselon_id = b.formula_eselon_id and a.atribut_id = b.atribut_id
+    where 1=1
+    group by b.pegawai_id
+  ) a
+  ;
+
+  --jenis_subindikator = 'kompetensi'
+  select permen_indikator_id, indikator_penilaian_id, jenis_subindikator, sub_indikator_id, nilai
+  into vpermenindikatorid, vindikatorpenilaianid, vjenissubindikator, vsubindikatorid, vnilaibobot
+  from simpeg.formula_penilaian_bobot where formula_penilaian_id = formulapenilaianid and jenis_subindikator = 'kompetensi';
+
+  select nilai into vnilaivalue
+  from simpeg.formula_penilaian_value where formula_penilaian_id = formulapenilaianid and jenis_subindikator = 'kompetensi';
+  
+  --simpan data
+  insert into simpeg.pegawai_formula_penilaian
+  (
+    pegawai_id, formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, 
+    jenis_subindikator, sub_indikator_id, nilai
+  )
+  select
+  pegawai_id, formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, jenis_subindikator, sub_indikator_id
+  , simpeg.pembagi(nilai,vnilaivalue) * simpeg.persentase(vnilaibobot,1)
+  from
+  (
+    select
+    b.pegawai_id, formulapenilaianid formula_penilaian_id, vpermenindikatorid permen_indikator_id
+    , vindikatorpenilaianid indikator_penilaian_id, vjenissubindikator jenis_subindikator, vsubindikatorid sub_indikator_id
+    , round(sum((a.atribut_bobot * (b.skor)) + ((a.atribut_bobot * (b.skor)) -(a.atribut_bobot * (b.skor)))),2) nilai
+    from formula_atribut_bobot a
+    inner join
+    (
+      select
+      pd.formula_eselon_id, pd.atribut_id
+      , nilai skor, p.pegawai_id, to_char(p.tanggal_tes, 'yyyy') tahun, p.jadwal_tes_id
+      from penilaian_detil pd
+      inner join penilaian p on pd.penilaian_id = p.penilaian_id
+      where 1=1 
+      and exists
+      (
+        select 1
+        from
+        (
+          select pegawai_id, penilaian_id
+          from penilaian a
+          where a.aspek_id = '2'
+          --and a.pegawai_id = 53
+          and exists
+          (
+            select 1
+            from
+            (
+              select pegawai_id, max(tanggal_tes) tanggal_tes from penilaian where aspek_id = '1' group by pegawai_id
+            ) x where a.pegawai_id = x.pegawai_id and a.tanggal_tes = x.tanggal_tes
+          )
+        ) x where x.pegawai_id = pd.pegawai_id and x.penilaian_id = pd.penilaian_id
+      )
+    ) b on a.formula_eselon_id = b.formula_eselon_id and a.atribut_id = b.atribut_id
+    where 1=1
+    group by b.pegawai_id
+  ) a
+  ;
+
+  --jenis_subindikator = 'pendidikan_formal'
+  --simpan data
+  sqlquery:= 'insert into simpeg.pegawai_formula_penilaian
+  (
+    pegawai_id, formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, 
+    jenis_subindikator, sub_indikator_id, nilai
+  )
+  select
+  a.pegawai_id, ' || formulapenilaianid || ' formula_penilaian_id
+  , a.permen_indikator_id, a.indikator_penilaian_id, a.jenis_subindikator, a.sub_indikator_id
+  , a.nilai
+  from
+  (
+    select
+    a.pegawai_id
+    , a.permen_indikator_id, a.indikator_penilaian_id, a.jenis_subindikator, a.sub_indikator_id
+    , sum(nilai) nilai
+    from
+    (
+      select
+      a.pegawai_id, a.pendidikan_id, a.tingkat_pendidikan_id
+      , b1.permen_indikator_id, b1.indikator_penilaian_id, b1.jenis_subindikator, -1 sub_indikator_id
+      --, b1.nilai nilai_bobot, b2.nilai nilai_value
+      , b2.nilai * simpeg.persentase(b1.nilai,1) nilai
+      from
+      (
+        select
+        row_number () over (partition by a.pegawai_id, a.pendidikan_id order by a.tanggal desc) nomor,
+        a.pegawai_id, a.pendidikan_id, a.kampus_id
+        , case when b1.tingkat_pendidikan_id = 4 then 1 when b1.tingkat_pendidikan_id = 1 or b1.tingkat_pendidikan_id = 2 then 2 else 3 end tingkat_pendidikan_id
+        from data.riwayat_pendidikan a
+        inner join simpeg.kampus b1 on a.kampus_id = b1.kampus_id
+        where 1=1
+        and a.pegawai_id is not null
+        --and pegawai_id = 53
+      ) a
+      inner join
+      (
+        select *
+        from simpeg.formula_penilaian_bobot where formula_penilaian_id = ' || formulapenilaianid || ' and jenis_subindikator = ''pendidikan_formal''
+      ) b1 on b1.sub_indikator_id = a.pendidikan_id
+      inner join
+      (
+        select *
+        from simpeg.formula_penilaian_value where formula_penilaian_id = ' || formulapenilaianid || ' and jenis_subindikator = ''pendidikan_formal''
+      ) b2 on b2.sub_indikator_id = a.pendidikan_id and b2.sub_indikator_detil_id = a.tingkat_pendidikan_id
+      where nomor = 1
+    ) a
+    group by a.pegawai_id
+    , a.permen_indikator_id, a.indikator_penilaian_id, a.jenis_subindikator, a.sub_indikator_id
+  ) a'
+  ;
+  --raise notice 'sql %', sqlquery;
+  execute sqlquery;
+  --select simpeg.ppetapegawai(1)
+
+  --jenis_subindikator = 'pelatihan'
+  --simpan data
+  sqlquery:= 'insert into simpeg.pegawai_formula_penilaian
+  (
+    pegawai_id, formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, 
+    jenis_subindikator, sub_indikator_id, nilai
+  )
+  select
+    a.pegawai_id, formula_penilaian_id
+    , a.permen_indikator_id, a.indikator_penilaian_id, a.jenis_subindikator, a.sub_indikator_id
+    , simpeg.pembulatan(sum(a.nilai)) nilai
+  from
+  (
+    select
+    a.pegawai_id, ' || formulapenilaianid || ' formula_penilaian_id
+    , a.permen_indikator_id, a.indikator_penilaian_id, a.jenis_subindikator, a.sub_indikator_id
+    , b1.nilai * simpeg.persentase(a.nilai, 1) nilai
+    from
+    (
+      select
+      a.pegawai_id, a.sub_indikator_detil_id
+      , b1.nilai, b1.permen_indikator_id, b1.indikator_penilaian_id, b1.jenis_subindikator, b1.sub_indikator_id
+      from
+      (
+        --ESELON SEMAKIN KECIL SEMAKIN BESAR
+  select
+  case when diklat_jenjang_pim < last_eselon_id then 1 when diklat_jenjang_pim = last_eselon_id then 2 else 3 end sub_indikator_detil_id
+  , a.*
+  from
+  (
+    select
+    row_number () over (partition by a.pegawai_id order by a.diklat_jenjang_pim) nomor,
+    a.pegawai_id, a.diklat_jenjang_pim, last_eselon_id::numeric last_eselon_id
+    from data.riwayat_diklat_struktural a
+    inner join
+    (
+      select pegawai_id, substring(last_eselon_id::text,1,1) last_eselon_id
+      from simpeg.pegawai
+    ) b on a.pegawai_id = b.pegawai_id
+    where 1=1
+    --and a.pegawai_id = 4169
+    and a.pegawai_id is not null
+    and a.diklat_jenjang_pim > 0
+    and last_eselon_id is not null
+  ) a
+  where 1=1 and nomor = 1
+      ) a
+      ,
+      (
+        select *
+        from simpeg.formula_penilaian_bobot where formula_penilaian_id = ' || formulapenilaianid || ' and jenis_subindikator = ''pelatihan'' and sub_indikator_id = 1
+      ) b1
+    ) a
+    inner join
+    (
+      select *
+      from simpeg.formula_penilaian_value where formula_penilaian_id = ' || formulapenilaianid || ' and jenis_subindikator = ''pelatihan'' and sub_indikator_id = 1
+    ) b1 on a.sub_indikator_detil_id = b1.sub_indikator_detil_id
+    union all
+    select
+    a.pegawai_id, ' || formulapenilaianid || ' formula_penilaian_id
+    , a.permen_indikator_id, a.indikator_penilaian_id, a.jenis_subindikator, a.sub_indikator_id
+    , b1.nilai * simpeg.persentase(a.nilai, 1) nilai
+    from
+    (
+      select
+      a.pegawai_id, case when a.jumlah >= 6 then 1 when a.jumlah >= 3 and a.jumlah < 6 then 2 else 3 end sub_indikator_detil_id
+      , b1.nilai, b1.permen_indikator_id, b1.indikator_penilaian_id, b1.jenis_subindikator, b1.sub_indikator_id
+      from
+      (
+        select pegawai_id, count(1) jumlah from data.riwayat_diklat_teknis group by pegawai_id
+      ) a
+      ,
+      (
+        select *
+        from simpeg.formula_penilaian_bobot where formula_penilaian_id = ' || formulapenilaianid || ' and jenis_subindikator = ''pelatihan'' and sub_indikator_id = 2
+      ) b1
+    ) a
+    inner join
+    (
+      select *
+      from simpeg.formula_penilaian_value where formula_penilaian_id = ' || formulapenilaianid || ' and jenis_subindikator = ''pelatihan'' and sub_indikator_id = 2
+    ) b1 on a.sub_indikator_detil_id = b1.sub_indikator_detil_id
+  ) a
+  group by a.pegawai_id, a.formula_penilaian_id, a.permen_indikator_id, a.indikator_penilaian_id, a.jenis_subindikator, a.sub_indikator_id'
+  ;
+  --raise notice 'sql %', sqlquery;
+  execute sqlquery;
+  --select simpeg.ppetapegawai(1)
+
+  --jenis_subindikator = 'jabatan'
+  --simpan data
+  sqlquery:= 'insert into simpeg.pegawai_formula_penilaian
+  (
+    pegawai_id, formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, 
+    jenis_subindikator, sub_indikator_id, nilai
+  )
+  select
+    a.pegawai_id, formula_penilaian_id
+    , a.permen_indikator_id, a.indikator_penilaian_id, a.jenis_subindikator, a.sub_indikator_id
+    , simpeg.pembulatan(sum(a.nilai)) nilai
+  from
+  (
+    select
+    a.pegawai_id, ' || formulapenilaianid || ' formula_penilaian_id
+    , a.permen_indikator_id, a.indikator_penilaian_id, a.jenis_subindikator, a.sub_indikator_id
+    , b1.nilai * simpeg.persentase(a.nilai, 1) nilai
+    from
+    (
+      select
+      a.pegawai_id, case when a.jumlah >= 5 then 1 when a.jumlah >= 2 and a.jumlah <= 4 then 2 else 3 end sub_indikator_detil_id
+      , b1.nilai, b1.permen_indikator_id, b1.indikator_penilaian_id, b1.jenis_subindikator, b1.sub_indikator_id
+      from
+      (
+  select a.pegawai_id, count(1) jumlah
+        from data.riwayat_jabatan a
+        inner join 
+        (
+    select pegawai_id, last_eselon_id from simpeg.pegawai where 1=1 --and pegawai_id = 4169
+        ) b on a.pegawai_id = b.pegawai_id and b.last_eselon_id = a.eselon_id
+        where 1=1 --and a.pegawai_id = 4169
+        group by a.pegawai_id
+      ) a
+      ,
+      (
+        select *
+        from simpeg.formula_penilaian_bobot where formula_penilaian_id = ' || formulapenilaianid || ' and jenis_subindikator = ''jabatan'' and sub_indikator_id = 1
+      ) b1
+    ) a
+    inner join
+    (
+      select *
+      from simpeg.formula_penilaian_value where formula_penilaian_id = ' || formulapenilaianid || ' and jenis_subindikator = ''jabatan'' and sub_indikator_id = 1
+    ) b1 on a.sub_indikator_detil_id = b1.sub_indikator_detil_id
+    union all
+    select
+    a.pegawai_id, ' || formulapenilaianid || ' formula_penilaian_id
+    , a.permen_indikator_id, a.indikator_penilaian_id, a.jenis_subindikator, a.sub_indikator_id
+    , b1.nilai * simpeg.persentase(a.nilai, 1) nilai
+    from
+    (
+      select
+      a.pegawai_id, case when a.lama >= 3 then 1 when a.lama >= 1 and a.lama < 3 then 2 else 3 end sub_indikator_detil_id
+      , b1.nilai, b1.permen_indikator_id, b1.indikator_penilaian_id, b1.jenis_subindikator, b1.sub_indikator_id
+      from
+      (
+        select
+        a.*
+        , simpeg.ambil_umur_tahun(a.tmt_jabatan, current_date)::numeric lama
+        from
+        (
+        select
+        row_number () over (partition by a.pegawai_id order by a.tmt_jabatan desc, riwayat_jabatan_id desc) nomor,
+        a.pegawai_id, a.tmt_jabatan::date
+        from data.riwayat_jabatan a
+        where 1=1 and a.tmt_jabatan is not null
+        ) a
+        where nomor = 1
+      ) a
+      ,
+      (
+        select *
+        from simpeg.formula_penilaian_bobot where formula_penilaian_id = ' || formulapenilaianid || ' and jenis_subindikator = ''jabatan'' and sub_indikator_id = 2
+      ) b1
+    ) a
+    inner join
+    (
+      select *
+      from simpeg.formula_penilaian_value where formula_penilaian_id = ' || formulapenilaianid || ' and jenis_subindikator = ''jabatan'' and sub_indikator_id = 2
+    ) b1 on a.sub_indikator_detil_id = b1.sub_indikator_detil_id
+    union all
+    select
+    a.pegawai_id, ' || formulapenilaianid || ' formula_penilaian_id
+    , a.permen_indikator_id, a.indikator_penilaian_id, a.jenis_subindikator, a.sub_indikator_id
+    , b1.nilai * simpeg.persentase(a.nilai, 1) nilai
+    from
+    (
+      select
+      a.pegawai_id, case when a.lama >= 5 then 1 when a.lama >= 2 and a.lama < 5 then 2 else 3 end sub_indikator_detil_id
+      , b1.nilai, b1.permen_indikator_id, b1.indikator_penilaian_id, b1.jenis_subindikator, b1.sub_indikator_id
+      from
+      (
+        select
+        a.pegawai_id, sum(a.lama) lama
+        from
+        (
+          select
+          a.*
+          , simpeg.ambil_umur_tahun(a.tmt_jabatan, current_date)::numeric lama
+          from
+          (
+            select
+            row_number () over (partition by a.pegawai_id order by a.tmt_jabatan desc, riwayat_jabatan_id desc) nomor,
+            a.pegawai_id, a.tmt_jabatan::date
+            , a.jenis_jabatan, a.nama_jenis_jabatan
+            from data.riwayat_jabatan a
+            where 1=1 and a.tmt_jabatan is not null and a.jenis_jabatan = ''1''
+          ) a
+        ) a
+        group by a.pegawai_id
+      ) a
+      ,
+      (
+        select *
+        from simpeg.formula_penilaian_bobot where formula_penilaian_id = ' || formulapenilaianid || ' and jenis_subindikator = ''jabatan'' and sub_indikator_id = 3
+      ) b1
+    ) a
+    inner join
+    (
+      select *
+      from simpeg.formula_penilaian_value where formula_penilaian_id = ' || formulapenilaianid || ' and jenis_subindikator = ''jabatan'' and sub_indikator_id = 3
+    ) b1 on a.sub_indikator_detil_id = b1.sub_indikator_detil_id
+  ) a
+  where 1=1
+  --and a.pegawai_id = 4169
+  group by a.pegawai_id, a.formula_penilaian_id, a.permen_indikator_id, a.indikator_penilaian_id, a.jenis_subindikator, a.sub_indikator_id'
+  ;
+  --raise notice 'sql %', sqlquery;
+  execute sqlquery;
+  --select simpeg.ppetapegawai(1)
+
+  --jenis_subindikator = 'komitmenorganisasi'
+  --simpan data
+  sqlquery:= 'insert into simpeg.pegawai_formula_penilaian
+  (
+    pegawai_id, formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, 
+    jenis_subindikator, sub_indikator_id, nilai
+  )
+  select
+  a.pegawai_id, ' || formulapenilaianid || ' formula_penilaian_id
+  , a.permen_indikator_id, a.indikator_penilaian_id, a.jenis_subindikator, a.sub_indikator_id
+  , a.nilai
+  from
+  (
+    select
+    a.pegawai_id
+    , a.permen_indikator_id, a.indikator_penilaian_id, a.jenis_subindikator, a.sub_indikator_id
+    , sum(nilai) nilai
+    from
+    (
+      select
+      a.pegawai_id
+      , b1.permen_indikator_id, b1.indikator_penilaian_id, b1.jenis_subindikator, -1 sub_indikator_id
+      , (case when a.nilai > b2.nilai then b2.nilai else a.nilai end) * simpeg.persentase(b1.nilai,1) nilai
+      from
+      (
+  select
+        row_number () over (partition by a.pegawai_id order by a.tahun desc) nomor,
+        a.pegawai_id, 1 sub_indikator_id, a.nilai
+        from data.riwayat_ess a
+        where 1=1
+        and a.pegawai_id is not null
+        --and pegawai_id = 53
+      ) a
+      inner join
+      (
+        select *
+        from simpeg.formula_penilaian_bobot where formula_penilaian_id = ' || formulapenilaianid || ' and jenis_subindikator = ''komitmenorganisasi''
+      ) b1 on b1.sub_indikator_id = a.sub_indikator_id
+      inner join
+      (
+        select *
+        from simpeg.formula_penilaian_value where formula_penilaian_id = ' || formulapenilaianid || ' and jenis_subindikator = ''komitmenorganisasi''
+      ) b2 on b2.sub_indikator_id = a.sub_indikator_id
+      where nomor = 1
+    ) a
+    group by a.pegawai_id
+    , a.permen_indikator_id, a.indikator_penilaian_id, a.jenis_subindikator, a.sub_indikator_id
+  ) a'
+  ;
+  --raise notice 'sql %', sqlquery;
+  execute sqlquery;
+  --select simpeg.ppetapegawai(1)
+
+  --untuk kesimpulan potensi
+  insert into simpeg.pegawai_formula_penilaian
+  (
+    pegawai_id, formula_penilaian_id, permen_indikator_id
+    , indikator_penilaian_id, jenis_subindikator, sub_indikator_id, nilai
+  )
+  select
+  a.pegawai_id, a.formula_penilaian_id, vpermenindikatorid permen_indikator_id, -1, 'jumlah_potensi', -1
+  , vpotensi + vkompetensi + vpendidikan_formal + vpelatihan + vjabatan + vkomitmenorganisasi + vpangkat nilai
+  from
+  (
+    select 
+    a.pegawai_id, a.formula_penilaian_id
+    , simpeg.pembulatan(a.potensi) vpotensi
+    , simpeg.pembulatan(a.kompetensi) vkompetensi
+    , simpeg.pembulatan(a.pendidikan_formal) vpendidikan_formal
+    , simpeg.pembulatan(a.pelatihan) vpelatihan
+    , simpeg.pembulatan(a.jabatan) vjabatan
+    , simpeg.pembulatan(a.komitmenorganisasi) vkomitmenorganisasi
+    , simpeg.pembulatan(a.komitmenorganisasi) vpangkat
+    from
+    (
+      select
+      a.pegawai_id, a.formula_penilaian_id
+      , sum(case when jenis_subindikator = 'potensi' then a.nilai else 0 end) potensi
+      , sum(case when jenis_subindikator = 'kompetensi' then a.nilai else 0 end) kompetensi
+      , sum(case when jenis_subindikator = 'pendidikan_formal' then a.nilai else 0 end) pendidikan_formal
+      , sum(case when jenis_subindikator = 'pelatihan' then a.nilai else 0 end) pelatihan
+      , sum(case when jenis_subindikator = 'jabatan' then a.nilai else 0 end) jabatan
+      , sum(case when jenis_subindikator = 'komitmenorganisasi' then a.nilai else 0 end) komitmenorganisasi
+      , sum(case when jenis_subindikator = 'pangkat' then a.nilai else 0 end) pangkat
+      from simpeg.pegawai_formula_penilaian a
+      group by a.pegawai_id, a.formula_penilaian_id
+    ) a
+  ) a
+  where 1=1;
+
+  --jenis_subindikator = 'skp'
+  --simpan data
+  sqlquery:= 'insert into simpeg.pegawai_formula_penilaian
+  (
+    pegawai_id, formula_penilaian_id, permen_indikator_id, indikator_penilaian_id, 
+    jenis_subindikator, sub_indikator_id, nilai
+  )
+  select
+  a.pegawai_id, ' || formulapenilaianid || ' formula_penilaian_id
+  , a.permen_indikator_id, a.indikator_penilaian_id, a.jenis_subindikator, a.sub_indikator_id
+  , a.nilai
+  from
+  (
+    select
+    a.pegawai_id
+    , a.permen_indikator_id, a.indikator_penilaian_id, a.jenis_subindikator, a.sub_indikator_id
+    , sum(nilai) nilai
+    from
+    (
+      select
+      a.pegawai_id
+      , b1.permen_indikator_id, b1.indikator_penilaian_id, b1.jenis_subindikator, -1 sub_indikator_id
+      , a.nilai * simpeg.persentase(b1.nilai,1) nilai
+      from
+      (
+    select 
+    row_number () over (partition by a.pegawai_id order by a.tahun desc) nomor
+    , 1 sub_indikator_id
+    , * from data.riwayat_skp a
+      ) a
+      inner join
+      (
+        select *
+        from simpeg.formula_penilaian_bobot where formula_penilaian_id = ' || formulapenilaianid || ' and jenis_subindikator = ''skp''
+      ) b1 on b1.sub_indikator_id = a.sub_indikator_id
+      where nomor = 1
+    ) a
+    group by a.pegawai_id
+    , a.permen_indikator_id, a.indikator_penilaian_id, a.jenis_subindikator, a.sub_indikator_id
+  ) a'
+  ;
+  --raise notice 'sql %', sqlquery;
+  execute sqlquery;
+  --select simpeg.ppetapegawai(1)
+
+  --untuk kesimpulan kompetensi
+  insert into simpeg.pegawai_formula_penilaian
+  (
+    pegawai_id, formula_penilaian_id, permen_indikator_id
+    , indikator_penilaian_id, jenis_subindikator, sub_indikator_id, nilai
+  )
+  select
+  a.pegawai_id, a.formula_penilaian_id, vpermenindikatorid permen_indikator_id, -2, 'jumlah_kompetensi', -1
+  , vskp nilai
+  from
+  (
+    select 
+    a.pegawai_id, a.formula_penilaian_id
+    , simpeg.pembulatan(a.skp) vskp
+    from
+    (
+      select
+      a.pegawai_id, a.formula_penilaian_id
+      , sum(case when jenis_subindikator = 'skp' then a.nilai else 0 end) skp
+      from simpeg.pegawai_formula_penilaian a
+      group by a.pegawai_id, a.formula_penilaian_id
+    ) a
+  ) a
+  where 1=1;
+  --raise notice 'sql %', vnilaivalue;
+  --execute sqlquery;
+  --select simpeg.ppetapegawai(1)
+  
+exception
+when others
+then raise exception 'an error was encountered - '; 
+
+end;
+$body$
+language plpgsql volatile cost 100;
+alter function simpeg.ppetapegawai(numeric) owner to postgres;

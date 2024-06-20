@@ -1,0 +1,36 @@
+
+
+
+
+
+
+
+
+
+
+
+INSERT INTO simpeg.pegawai( pegawai_id, nip_baru,nip, nama, last_jabatan,  last_pangkat_id, tgl_lahir, jenis_kelamin) VALUES ((select max(pegawai_id)+1 from simpeg.pegawai),'198408062003121001','198408062003121001','Leo Efriansa S.STP, M.Si','KEPALA SEKSI KEPENGHULUAN DAN FASILITASI BINA KELUARGA SAKINAH',11, '1984-08-06', 'L');
+INSERT INTO simpeg.pegawai( pegawai_id, nip_baru,nip, nama, last_jabatan,  last_pangkat_id, tgl_lahir, jenis_kelamin) VALUES ((select max(pegawai_id)+1 from simpeg.pegawai),'196702101988031006','196702101988031006','Dr. H. Arief Moelia Edie ,M.Si','Analis Kebijakan Ahli Madya',11, '1967-02-10', 'L');
+INSERT INTO simpeg.pegawai( pegawai_id, nip_baru,nip, nama, last_jabatan,  last_pangkat_id, tgl_lahir, jenis_kelamin) VALUES ((select max(pegawai_id)+1 from simpeg.pegawai),'197205241998031001','197205241998031001','Iwan Kurniawan ST.,MM.','Kepala Biro Administrasi Kerja Sama Dan Hukum',11, '1972-05-24', 'L');
+INSERT INTO simpeg.pegawai( pegawai_id, nip_baru,nip, nama, last_jabatan,  last_pangkat_id, tgl_lahir, jenis_kelamin) VALUES ((select max(pegawai_id)+1 from simpeg.pegawai),'197301231992031001','197301231992031001','Drs Benni Irwan M.Si','Direktur Perencanaan Evaluasi Dan Informasi Pembangunan Daerah',11, '1973-01-23', 'L');
+INSERT INTO simpeg.pegawai( pegawai_id, nip_baru,nip, nama, last_jabatan,  last_pangkat_id, tgl_lahir, jenis_kelamin) VALUES ((select max(pegawai_id)+1 from simpeg.pegawai),'196510281992031001','196510281992031001','Ir.  Togap Simangunsong M.App, Sc','Kepala Pusat Penerangan',11, '1965-10-28', 'L');
+INSERT INTO simpeg.pegawai( pegawai_id, nip_baru,nip, nama, last_jabatan,  last_pangkat_id, tgl_lahir, jenis_kelamin) VALUES ((select max(pegawai_id)+1 from simpeg.pegawai),'197201131992031004','197201131992031004','Drs. Jeditjia Huwae, M.Si','Plt. Staf Ahli Menteri Bidang Kemasyarakatan Dan Hubungan Antar Lembaga / Pengawas Penyelenggaraan Urusan Pemerintahan Daerah Ahli Utama',11, '1972-01-13', 'L');
+INSERT INTO simpeg.pegawai( pegawai_id, nip_baru,nip, nama, last_jabatan,  last_pangkat_id, tgl_lahir, jenis_kelamin) VALUES ((select max(pegawai_id)+1 from simpeg.pegawai),'196606251996031001','196606251996031001','Ir. Amiruddin. A M.AP','Inspektur Daerah',11, '1966-06-25', 'L');
+INSERT INTO simpeg.pegawai( pegawai_id, nip_baru,nip, nama, last_jabatan,  last_pangkat_id, tgl_lahir, jenis_kelamin) VALUES ((select max(pegawai_id)+1 from simpeg.pegawai),'197208141993111001','197208141993111001','Hamidi , AP, M.Si','Staf Ahli Bupati Paser Bidang Pemerintahan Dan Hukum',11, '1972-08-14', 'L');
+INSERT INTO simpeg.pegawai( pegawai_id, nip_baru,nip, nama, last_jabatan,  last_pangkat_id, tgl_lahir, jenis_kelamin) VALUES ((select max(pegawai_id)+1 from simpeg.pegawai),'196611221993031001','196611221993031001','Dr. Ir. Bachril Bakri M.App.Sc','Sekretaris ',11, '1966-11-22', 'L');
+INSERT INTO simpeg.pegawai( pegawai_id, nip_baru,nip, nama, last_jabatan,  last_pangkat_id, tgl_lahir, jenis_kelamin) VALUES ((select max(pegawai_id)+1 from simpeg.pegawai),'197706062001121001','197706062001121001','Dr. Ir. David Yama M.Sc, MA.','Kepala Biro Perencanaan',11, '1977-06-06', 'L');
+INSERT INTO simpeg.pegawai( pegawai_id, nip_baru,nip, nama, last_jabatan,  last_pangkat_id, tgl_lahir, jenis_kelamin) VALUES ((select max(pegawai_id)+1 from simpeg.pegawai),'197401011993031002','197401011993031002','T.R.Fahsul Falah ,S.Sos.,M.Si','Direktur Pendaftaran Penduduk, Direktorat Jenderal Kependudukan Dan Pencatatan Sipil',11, '1974-01-01', 'L');
+INSERT INTO simpeg.pegawai( pegawai_id, nip_baru,nip, nama, last_jabatan,  last_pangkat_id, tgl_lahir, jenis_kelamin) VALUES ((select max(pegawai_id)+1 from simpeg.pegawai),'196908181996031001','196908181996031001','Raden Gani Muhammad SH., MAP','Kepala Pusat',11, '1969-08-18', 'L');
+INSERT INTO simpeg.pegawai( pegawai_id, nip_baru,nip, nama, last_jabatan,  last_pangkat_id, tgl_lahir, jenis_kelamin) VALUES ((select max(pegawai_id)+1 from simpeg.pegawai),'197402241993111004','197402241993111004','Dr. La Ode Ahmad Pidana Bolombo AP.,M.Si','Direktur Ketahanan Ekonomi, Sosial Dan Budaya Ditjen Polpum',11, '1974-02-24', 'L');
+INSERT INTO simpeg.pegawai( pegawai_id, nip_baru,nip, nama, last_jabatan,  last_pangkat_id, tgl_lahir, jenis_kelamin) VALUES ((select max(pegawai_id)+1 from simpeg.pegawai),'197401111993111002','197401111993111002','Dr. Bambang Arwanto A.P.,M.Si','Kepala Dinas Penanaman Modal Dan Pelayanan Terpadu Satu Pintu',11, '1974-01-11', 'L');
+INSERT INTO simpeg.pegawai( pegawai_id, nip_baru,nip, nama, last_jabatan,  last_pangkat_id, tgl_lahir, jenis_kelamin) VALUES ((select max(pegawai_id)+1 from simpeg.pegawai),'196504051994031001','196504051994031001','Drs. Akhmad Sudirman Tavipiyono MM, MA','Direktur Fasilitasi Pemanfaatan Data Dan Dokumen Kependudukan',11, '1965-04-05', 'L');
+INSERT INTO simpeg.pegawai( pegawai_id, nip_baru,nip, nama, last_jabatan,  last_pangkat_id, tgl_lahir, jenis_kelamin) VALUES ((select max(pegawai_id)+1 from simpeg.pegawai),'196904181989091001','196904181989091001','Dr. Hendriwan M.Si.','Direktur Pendapatan Daerah',11, '1969-04-18', 'L');
+INSERT INTO simpeg.pegawai( pegawai_id, nip_baru,nip, nama, last_jabatan,  last_pangkat_id, tgl_lahir, jenis_kelamin) VALUES ((select max(pegawai_id)+1 from simpeg.pegawai),'196803021993031002','196803021993031002','Dr. Drs. Horas M Panjaitan M.Ec.Dev','Direktur Pelaksanaan Dan Pertanggungjawaban Keuangan Daerah',11, '1968-03-02', 'L');
+INSERT INTO simpeg.pegawai( pegawai_id, nip_baru,nip, nama, last_jabatan,  last_pangkat_id, tgl_lahir, jenis_kelamin) VALUES ((select max(pegawai_id)+1 from simpeg.pegawai),'196901101993032001','196901101993032001','Ir. Zanariah M.Si','Direktur Sinkronisasi Urusan Pemerintahan Daerah Iv',11, '1969-01-10', 'P');
+
+
+
+
+
+
+

@@ -1,0 +1,157 @@
+.responsive-calendar {
+	*padding-top:14px;
+	padding-top:1px;
+}
+.responsive-calendar .controls {
+  text-align: center;
+  
+}
+.responsive-calendar .controls a {
+  cursor: pointer;
+}
+.responsive-calendar .controls h4 {
+  display: inline;
+  line-height:30px;
+}
+.responsive-calendar .day-headers,
+.responsive-calendar .days {
+  font-size: 0;
+}
+.responsive-calendar .day {
+  display: inline-block;
+  position: relative;
+  *font-size: 14px;
+  font-size: 12px;
+  width: 14.285714285714286%;
+  text-align: center;
+}
+.responsive-calendar .day a {
+	*background:#e66b1d;
+	background:white;
+	
+	color: #000000;
+	display: block;
+	cursor: pointer;
+	*padding: 20% 0 20% 0;
+	margin: 3px;
+	border-radius: 5px;
+}
+.responsive-calendar .day a:hover {
+  background-color: #0b696c;
+  text-decoration: none;
+  color:white;
+}
+.responsive-calendar .day.header {
+  border-bottom: 1px gray solid;
+}
+.responsive-calendar .day.active a {
+	background:#073b50;
+	*background-color: #1d86c8;
+	*border:1px solid #f0f0f0;
+	color: #ffffff;
+	
+	*-webkit-border-radius: 4px;
+	*-moz-border-radius: 4px;
+	*border-radius: 4px;
+	
+	*background:#e66b1d;
+	
+	*background:#eee;
+}
+.responsive-calendar .day.active a:hover {
+	*background-color: #36a0e2;
+	background:#f0f0f0;
+	
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+}
+.responsive-calendar .day.active .not-current {
+  background-color: #8fcaef;
+  color: #ffffff;
+}
+.responsive-calendar .day.active .not-current:hover {
+  background-color: #bcdff5;
+}
+.responsive-calendar .day.not-current a {
+	color: white;
+	*background:red;
+	background: #096a6b;
+	margin: 3px;
+	border-radius: 5px;
+}
+.responsive-calendar .day .badge {
+	position: absolute;
+	top: 1px;
+	right: 2px;
+	z-index: 1;
+	
+	-webkit-border-radius: 1px;
+	-webkit-border-top-right-radius: 4px;
+	-webkit-border-bottom-left-radius: 4px;
+	-moz-border-radius: 1px;
+	-moz-border-radius-topright: 4px;
+	-moz-border-radius-bottomleft: 4px;
+	border-radius: 1px;
+	border-top-right-radius: 4px;
+	border-bottom-left-radius: 4px;
+}
+
+/****/
+.responsive-calendar .controls .pull-left .btn.btn-primary,
+.responsive-calendar .controls .pull-right .btn.btn-primary{
+	background:#073d53;
+}
+.responsive-calendar .day-headers .day.header{
+	*background:#f4f4f4 !important;
+/*	background:#f8a406 !important;*/
+	*margin-right:1px;
+	box-sizing:border-box;
+/*	border:1px solid #0d77a1;*/
+	*border-width:0px 1px 0px 0px ;
+	border-width:0px 1px 0px 0px ;
+}
+.responsive-calendar .active{
+	*background:#0CF;
+	background:#fbfbfb;
+	
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+
+	
+}
+.responsive-calendar .day{
+	*border:2px solid red;
+	*padding:2px;
+}
+/*.day.fri.past.active*/
+
+.responsive-calendar .day a {
+	*color: #000000;
+	*display:inline-block;
+	*cursor: pointer;
+	
+	*margin:9px auto 8px;
+	
+	*width:30px;
+	*height:35px;
+	*line-height:35px;
+	
+	
+}
+
+/****/
+.day-headers .day.header{
+	line-height:40px;
+}
+.day-headers .day.header:last-child{
+	border-right:none;
+}
+.days .day a{
+	line-height:30px;
+	*box-sizing:border-box;
+	*border-bottom:1px solid red;
+	*margin-bottom:2px ;
+}
+
