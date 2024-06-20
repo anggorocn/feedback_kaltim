@@ -1,0 +1,121 @@
+@import url("font-modif.css");
+html{
+}
+body{
+  font-family: 'Catamaran Regular';
+ 
+}
+
+.warnatandamerah { background-color:#FC7370; }
+
+/****/
+.area-kiri-login {
+    height: 100vh; 
+    /*background-image: url('assets/media/bg/bg-login2.png'); */
+    /*background-size: auto 100%; */
+    /*background-position: right bottom;*/
+    
+    padding: 20px;
+}
+.area-kiri-login > .inner {
+    background: #063a69;
+    width: calc(100% - 0px);
+    height: 100%;
+
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+    border-radius: 20px;
+}
+.area-kanan-login .nama-aplikasi {
+/*                background: #FFFFFF;*/
+    color:  #fff;
+    padding: 20px;
+    text-align: center;
+/*                border: 1px solid red;*/
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+}
+.area-kanan-login .nama-aplikasi h4 {
+    font-size: 24px !important;
+   
+    color:  #333333;
+}
+.area-kanan-login .nama-aplikasi span {
+	/*color: #333;*/
+	font-size: 16px;
+	/*background-color: rgba(0,0,0,0.1);*/
+	background: #063a69;
+	display: inline-block;
+	padding: 0 10px 5px;
+}
+.area-kanan-login {
+    height: 100vh-0px; 
+    display: flex; justify-content: center; align-items: center; 
+/*    background: #EEF0F8 url(../../images/logo.png) top 30px center no-repeat;*/
+    background-size: 250px auto;
+
+}
+@media screen and (max-width:767px) {
+	.area-kiri-login > .inner img {
+		height: 120px;
+	}
+    .d-flex.flex-center.flex-row-fluid.bgi-size-cover.bgi-position-top.bgi-no-repeat {
+/*                    display: inherit !important;*/
+    }
+    .area-kiri-login {
+        position: absolute;
+        top: 0;
+        height: 30vh;
+        width: 100%;
+        display: inline-block;
+/*                    border: 1px solid red;*/
+        background-size: 100% 100%; 
+    }
+    .area-kanan-login {
+        position: absolute;
+        bottom: 0;
+        height: 70vh;
+        width: 100%;
+        display: inline-block;
+/*                    border: 1px solid cyan;*/
+    }
+    .area-kanan-login {
+	    /*height: 100vh; */
+	    /*display: flex; justify-content: center; align-items: center; */
+	    background: #EEF0F8 url(../../images/map-indonesia.png) top 0px right no-repeat;
+	    background-size: 300px auto;
+
+	}
+}
+
+.login-signin input.form-control {
+    /*border: 1px solid rgba(0,0,0,0.1);*/
+    border: 1px solid #063a69;
+}
+.login-signin input.form-control:focus {
+    /*background-color: yellow;*/
+    border: 1px solid #f2ad10;
+}
+.login-signin button {
+    width: 100%;
+    margin: 0 0 !important;
+    border: none;
+    background-color: #f2ad10 !important;
+    color: #FFFFFF !important;
+    letter-spacing: 2px;
+}
+.login-signin button:hover {
+    /*background-color: #f1a700 !important;*/
+    background-color: #333 !important;
+}
+footer.container {
+    margin-top: 40px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    padding-top: 30px;
+}
+        
